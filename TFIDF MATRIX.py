@@ -4,50 +4,36 @@ Created on Wed Oct 26 20:23:08 2016
 
 @author: praneetdutta
 """
+import collections # optional, but we found the collections.Counter object useful
+import scipy.sparse as sp
+import numpy as np 
+
+
+import pickle
+
 def tfidf(abstract):
- numberdocs=len(docs)
-    allword={}
-    i=0
-    logup=np.log(len(docs))
-    listofdicts=[]
-    for element in docs:
-        dictelement={}
-        wordinsent=element.split()
-        for element1 in wordinsent:
-            if element1 in dictelement:
-                dictelement[element1]+=1
-            else:
-                dictelement[element1]=1
-        listofdicts.append(dictelement)
-        for wordd in dictelement.keys():
-            if wordd in allword:
-                allword[wordd]+=1
-            else:
-                allword[wordd]=1
-        i+=1
-  
-    dataa=[]
-    xentry=[]
-    yentry=[]          
-    for word in allword:
-        j=0
-        for element in docs:
-            currentdict=listofdicts[j]
-            if word in element:
-             if(word in currentdict and word in allword):
-               value=float(currentdict[word]*(logup-(np.log(allword[word]))))
-               if(value!=0):
-                   dataa.append(value)
-                   xentry.append(j)
-                   yentry.append(allword.keys().index(word))
-                   
-            j+=1
-    all_words=[]
-    for element in allword.keys():
-        all_words.append(element)
-    dataa= np.array(dataa)
-    xentry=np.array(xentry)
-    yentry=np.array(yentry)        
-   
-    tfidf=sp.csr_matrix((dataa, (xentry,yentry)))
-    return (tfidf)
+
+  all_words=set([a for a in " ".join(abstract).split(" ") if a!=""])
+  all_words_dict={k:i for i,k in enumerate(all_words)}
+  word_counts=[collections.Counter([a for a in d.split(" ") if a !=""]) for d in abstract]
+  data=[a for wc in word_counts for a in wc.values()]
+  rows=[i for i,wc in enumerate(word_counts) for a in wc.values()]
+  cols=[all_words_dict[k] for wc in word_counts for k in wc.keys()]
+  X=sp.coo_matrix((data,(rows,cols)),(len(abstract),len(all_words)))    
+  idf=np.log(float(len(abstract))/np.asarray((X>0).sum(axis=0))[0])
+  return X*sp.diags(idf),list(all_words)
+
+
+testp = pickle.load( open( "2016.pkl", "rb" ) )
+print len(testp)
+x=testp[1:500]
+
+x=[xx.encode('UTF8') for xx in x]
+
+a,b=tfidf(x)
+a[0].get_shape()
+#favorite_color = pickle.load( open( "save.p", "rb" ) )
+ 
+ 
+ 
+
