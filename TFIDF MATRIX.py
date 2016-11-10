@@ -15,6 +15,7 @@ import collections
 stop_list=stopwords.words('english')
 from tfidf_and_cosine import tfidf
 from tfidf_and_cosine import cosine_similarity
+import operator
 #stop=[xx.encode('UTF8') for xx in stop_list]
 #print stop
 import pickle
@@ -24,7 +25,8 @@ import pickle
 
 testp = pickle.load( open( "2016.pkl", "rb" ) )
 #print len(testp)
-x=testp[1:5000]
+number_of_docs=10000
+x=testp[1:number_of_docs]
 
 x=[xx.encode('UTF8') for xx in x]
 #####STOP WORD REMOVAL START########################
@@ -65,13 +67,13 @@ plt.ylabel("Frequency")
 ###############PLOTTING THEM#####################
 
 thres=15
-print dict_words
+#print dict_words
 #top=sorted(dict_words, key=c.__getitem__)
 top = sorted(dict_words.items(), key=operator.itemgetter(1))
-print top
-#top_n=top[len(top)-thres:]
-#top_n=top_n[::-1]
-#print top_n 
+#print top
+top_n=top[len(top)-thres:]
+top_n=top_n[::-1]
+print top_n 
 
 
 #import pylab as plt
