@@ -13,31 +13,18 @@ import numpy as np
 from nltk.corpus import stopwords
 import collections
 stop_list=stopwords.words('english')
+from tfidf_and_cosine import tfidf
+from tfidf_and_cosine import cosine_similarity
 #stop=[xx.encode('UTF8') for xx in stop_list]
 #print stop
 import pickle
 
 
 
-#####INSERT DATA CLEANING REMOVING STOP WORDS#########
-def tfidf(abstract):
-
-  all_words=set([a for a in " ".join(abstract).split(" ") if a!=""])
-  all_words_dict={k:i for i,k in enumerate(all_words)}
-  word_counts=[collections.Counter([a for a in d.split(" ") if a !=""]) for d in abstract]
-  data=[a for wc in word_counts for a in wc.values()]
-  rows=[i for i,wc in enumerate(word_counts) for a in wc.values()]
-  #print all_words_dict
-  cols=[all_words_dict[k] for wc in word_counts for k in wc.keys()]
-  #print cols,rows
-  X=sp.coo_matrix((data,(rows,cols)),(len(abstract),len(all_words)))    
-  idf=np.log(float(len(abstract))/np.asarray((X>0).sum(axis=0))[0])
-  return X*sp.diags(idf),list(all_words),all_words_dict
-
 
 testp = pickle.load( open( "2016.pkl", "rb" ) )
 #print len(testp)
-x=testp[1:500]
+x=testp[1:5000]
 
 x=[xx.encode('UTF8') for xx in x]
 #####STOP WORD REMOVAL START########################
@@ -49,68 +36,53 @@ for sentence in x:
     
 #print test_1
 ##############STOP WORD REMOVAL COMPLETE############################
+    
+    
 sparse_mat,word_list,dict_words=tfidf(x)
 
 
 
-def cosine_similarity(X):
-    X=sk.normalize(X,norm='l2',axis=1)
-    return X.dot(X.T).todense()
-"""    
-def cosine_similarity2(X):
-    
-    import numpy as np
-    rowp=X.shape[0]
-    M=np.zeros((rowp,rowp))
-    for i in range(rowp):  
-        for j in range(rowp):
-            if(i==j):
-                M[i][j]=0
-            else:
-                first=(X.getrow(i).toarray()[0])
-                second=(X.getrow(j).toarray()[0])
-                numerator=np.dot(first,second)
-                xfirst=pow(sum([l*l for l in first]),0.5)
-                xsecond=pow(sum([l*l for l in second]),0.5)
-                denominator=xfirst*xsecond
-                M[i][j]=float(numerator/denominator)
-              
-                
-            
- 
-    return M
-    pass
-"""  
-    
+             
+###########GETTING MOST SIMILAR DOCUMENTS############
 doc_sim=cosine_similarity(sparse_mat)  
-print doc_sim
+#print doc_sim
 M,N=(doc_sim).shape
-print M,N
+#print M,N
 a = np.ones((M, M), int)
 np.fill_diagonal(a, 0)
-print a
-#plt.hist(gaussian_numbers)
-##plt.title("Gaussian Histogram")
-#plt.xlabel("Value")
-#plt.ylabel("Frequency")
+#print a
+Cosine_List=np.multiply(doc_sim,a)
+#print Cosine_List
+Highest_Sim=np.argmax(Cosine_List,axis=1)
+High=np.argmax(Highest_Sim)
+#print High
+#print testp[High]
+plt.hist(Highest_Sim,M)
+plt.title("Document Similiarty Histogram")
+plt.xlabel("Document Number")
+plt.ylabel("Frequency")
+
+###############PLOTTING THEM#####################
 
 thres=15
-#print c
-top=sorted(c, key=c.__getitem__)
-top_n=top[len(top)-thres:]
+print dict_words
+#top=sorted(dict_words, key=c.__getitem__)
+top = sorted(dict_words.items(), key=operator.itemgetter(1))
+print top
+#top_n=top[len(top)-thres:]
 #top_n=top_n[::-1]
 #print top_n 
 
 
-import pylab as plt
+#import pylab as plt
 
-DayOfWeekOfCall = [1,2,3]
-DispatchesOnThisWeekday = [77, 32, 42]
+#DayOfWeekOfCall = [1,2,3]
+#DispatchesOnThisWeekday = [77, 32, 42]
 
-LABELS = ["Monday", "Tuesday", "Wednesday"]
+#LABELS = ["Monday", "Tuesday", "Wednesday"]
 
-plt.bar(DayOfWeekOfCall, DispatchesOnThisWeekday, align='center')
-plt.xticks(DayOfWeekOfCall, LABELS)
-plt.show() 
+#plt.bar(DayOfWeekOfCall, DispatchesOnThisWeekday, align='center')
+#plt.xticks(DayOfWeekOfCall, LABELS)
+#plt.show() 
  
 
