@@ -4,15 +4,20 @@ Created on Wed Oct 26 20:23:08 2016
 
 @author: praneetdutta
 """
-import collections # optional, but we found the collections.Counter object useful
+
 import scipy.sparse as sp
 import numpy as np 
 import sklearn.preprocessing as sk
 import matplotlib.pyplot as plt
 import numpy as np
-
-
+from nltk.corpus import stopwords
+import collections
+stop_list=stopwords.words('english')
+#stop=[xx.encode('UTF8') for xx in stop_list]
+#print stop
 import pickle
+
+
 
 #####INSERT DATA CLEANING REMOVING STOP WORDS#########
 def tfidf(abstract):
@@ -35,15 +40,23 @@ testp = pickle.load( open( "2016.pkl", "rb" ) )
 x=testp[1:500]
 
 x=[xx.encode('UTF8') for xx in x]
-
-a,b,c=tfidf(x)
+#####STOP WORD REMOVAL START########################
+test_1=[]
+for sentence in x:
+    sentence=sentence.lower()
+    text = ' '.join([word for word in sentence.split() if word not in (stopwords.words('english'))])
+    test_1.append(text)
+    
+#print test_1
+##############STOP WORD REMOVAL COMPLETE############################
+sparse_mat,word_list,dict_words=tfidf(x)
 
 
 
 def cosine_similarity(X):
     X=sk.normalize(X,norm='l2',axis=1)
     return X.dot(X.T).todense()
-    
+"""    
 def cosine_similarity2(X):
     
     import numpy as np
@@ -67,21 +80,26 @@ def cosine_similarity2(X):
  
     return M
     pass
-     
+"""  
     
-#doc_sim=cosine_similarity2(a)  
-#print doc_sim
+doc_sim=cosine_similarity(sparse_mat)  
+print doc_sim
+M,N=(doc_sim).shape
+print M,N
+a = np.ones((M, M), int)
+np.fill_diagonal(a, 0)
+print a
 #plt.hist(gaussian_numbers)
 ##plt.title("Gaussian Histogram")
 #plt.xlabel("Value")
 #plt.ylabel("Frequency")
 
 thres=15
-print c
+#print c
 top=sorted(c, key=c.__getitem__)
 top_n=top[len(top)-thres:]
 #top_n=top_n[::-1]
-print top_n 
+#print top_n 
 
 
 import pylab as plt
@@ -93,7 +111,6 @@ LABELS = ["Monday", "Tuesday", "Wednesday"]
 
 plt.bar(DayOfWeekOfCall, DispatchesOnThisWeekday, align='center')
 plt.xticks(DayOfWeekOfCall, LABELS)
-plt.show()
- 
+plt.show() 
  
 
