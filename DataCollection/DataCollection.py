@@ -8,6 +8,7 @@ Created on Thu Nov 10 02:09:08 2016
 
 import ijson
 import pickle
+import time
 
 def dataCollection(year):
     filename = "%s.json" % year
@@ -27,7 +28,12 @@ def dataCollection(year):
         pkl_handle.close()
         
 # Example
-# dataCollection(2016)
+for yr in [1995]:
+    start_time = time.time()
+
+    dataCollection(yr)
+
+    print "Time taken: %s" % (time.time() - start_time)
 
 def loadPickle(year):
     pkl_file = "%s.pkl" % year
