@@ -26,14 +26,17 @@ def dataCollection(year):
         # Dump List of titles into a Pickle file
         pickle.dump(keyData, pkl_handle)
         pkl_handle.close()
+ 
         
 # Example
-for yr in [1995]:
-    start_time = time.time()
+dataCollection(2016)
 
-    dataCollection(yr)
+#for yr in [1995]:
+#    start_time = time.time()
 
-    print "Time taken: %s" % (time.time() - start_time)
+#    dataCollection(yr)
+
+#    print "Time taken: %s" % (time.time() - start_time)
 
 def loadPickle(year):
     pkl_file = "%s.pkl" % year
