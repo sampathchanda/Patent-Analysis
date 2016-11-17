@@ -69,9 +69,6 @@ class Scholar():
 			time.sleep(1)
 		print title_set
 
-	def get_all_content(self):
-		title = get_page_content(url)
-
 
 def main():
 	parser = OptionParser()
