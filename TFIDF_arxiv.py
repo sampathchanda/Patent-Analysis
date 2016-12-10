@@ -69,7 +69,7 @@ def categoryPrediction(arxivData, abstractTfidf):
 
 
 if __name__ == "__main__":
-    arxivData = importData(sys.argv[1:50])
+    arxivData = importData(sys.argv[1:])
     tfidf, abstractTfidf = tfidfGen(arxivData)
     docAnalysis(tfidf, abstractTfidf)
     categoryPrediction(arxivData, abstractTfidf)
