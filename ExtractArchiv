@@ -1,0 +1,27 @@
+#!/usr/bin/env python2
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Dec  8 18:12:03 2016
+
+@author: praneetdutta
+"""
+
+import numpy as np
+import os
+import gzip
+
+#path='/Users/praneetdutta/Desktop/data /cs'
+path='./data /cs'
+for filename in os.listdir(path):
+    #print filename
+   
+    pathh=path+'/'+filename
+    if(pathh.endswith('gz')):
+     with gzip.open(pathh, 'rb') as f:
+      file_content = f.read()
+      
+     
+      z=file_content[16:]
+      
+      
+     
