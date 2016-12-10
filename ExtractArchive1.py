@@ -5,7 +5,7 @@ Created on Thu Dec  8 19:24:27 2016
 
 @author: praneetdutta
 """ 
-  
+   
 
 import numpy as np
 import os
@@ -14,9 +14,15 @@ import pdngram
 from pdngram import LanguageModel
 
 #path='/Users/praneetdutta/Desktop/data /cs'
+"""
 path='./data /cs'
-listp=[]
-for filename in os.listdir(path):
+path1='./data /physics'
+path2='./data /cs'
+path3='./data /cs'
+"""
+def extractp(path):
+ listp=[]
+ for filename in os.listdir(path):
     #print filename
     
     pathh=path+'/'+filename
@@ -30,9 +36,16 @@ for filename in os.listdir(path):
       #print "z",z
       listp.append(z)
       
-      
-print "hi"      
-our_ngram=LanguageModel(listp[:800],4)
+ return listp     
+ """
+listp=extractp(path)    
+print "ListP"
+our_ngram=LanguageModel(listp[:800],3)
 print our_ngram.sample(200)
 
+listp=extractp(path1)    
+print "ListP"
+our_ngram=LanguageModel(listp[:800],3)
+print our_ngram.sample(200)
+"""
      
