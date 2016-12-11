@@ -7,7 +7,7 @@ import random
 from sklearn.svm import SVC
 import numpy as np
 from operator import itemgetter
-
+ 
 def importData(files):
     arxivData = pd.DataFrame(columns=['ID', 'Category', 'Title', 'Abstract'])
     for file in files:
@@ -20,21 +20,23 @@ def importData(files):
     categories = list(set(arxivData['Category']))
     for ind, cat in enumerate(categories):
         categoryDict[cat] = ind
-    labels = [categoryDict[cat] for cat in arxivData['Category']]
+    labels = [None]*arxivData.shape[0]
+    labels = [categoryDict[arxivData['Category'].iloc[i]] for i in xrange(arxivData.shape[0])]
+#    labels = [categoryDict[cat] for cat in arxivData['Category']]
     arxivData['Labels'] = labels
 
     print "Data Read"
     return arxivData
 
 def tfGen(arxivData):
-    tf = text.TfidfVectorizer(use_idf=False, analyzer='word', ngram_range=(1, 5), stop_words='english')
+    tf = text.TfidfVectorizer(use_idf=False, analyzer='word', ngram_range=(1, 3), stop_words='english')
     abstractTf = tf.fit_transform(arxivData['Abstract'])
 
     print "TF marix generated"
     return (tf, abstractTf)
 
 def tfidfGen(arxivData):
-    tfidf = text.TfidfVectorizer(analyzer='word', ngram_range=(1, 5), stop_words='english')
+    tfidf = text.TfidfVectorizer(analyzer='word', ngram_range=(1, 3), stop_words='english')
     abstractTfidf = tfidf.fit_transform(arxivData['Abstract'])
 
     print "TFIDF matrix generated"
@@ -45,7 +47,7 @@ def docAnalysis(tfidf, abstractTfidf):
     docs = random.sample(xrange(abstractTfidf.shape[0]), 100)
     print "Writing TFIDF scores to file"
     with open('AbstractAnalysis', 'w') as fd:
-        for doc in docs:
+        for doc in docs: 
             feature_index = abstractTfidf[doc,:].nonzero()[1]
             tfidf_scores = zip(feature_index, [abstractTfidf[doc, x] for x in feature_index])
             tfidf_scores = sorted(tfidf_scores, key=itemgetter(1))
@@ -69,8 +71,14 @@ def categoryPrediction(arxivData, abstractTfidf):
 
 
 if __name__ == "__main__":
-    arxivData = importData(sys.argv[1:])
+    arxivFile = 'arxivData.pkl'
+    if os.path.isfile(arxivFile):
+        arxivData = pd.read_pickle(arxivFile)
+    else:
+        arxivData = importData(sys.argv[1:])
+        arxivData.to_pickle('arxivData.pkl')
+    #print arxivData.shape[0]
     tfidf, abstractTfidf = tfidfGen(arxivData)
     docAnalysis(tfidf, abstractTfidf)
-    categoryPrediction(arxivData, abstractTfidf)
+    categoryPrediction(arxivData.iloc[:300], abstractTfidf[:300])
     sys.exit()
